@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
                 var data = response;
                 console.log('Data length:', data.length); // Moved after data definition
 
-                var rowsPerPage = 10;
+                var rowsPerPage = 25;
                 var currentPage = 1;
                 var totalPages = Math.ceil(data.length / rowsPerPage);
 
@@ -60,15 +60,18 @@ jQuery(document).ready(function($) {
 
                 function renderPagination() {
                     var pagination = '<div style="text-align:center;">';
+                    pagination += '<label for="page-select">Page: </label>';
+                    pagination += '<select id="page-select">';
                     for (var i = 1; i <= totalPages; i++) {
-                        pagination += '<button class="pagination-button" data-page="' + i + '" style="margin: 0 5px;">Page:' + i + '</button>';
+                        pagination += '<option value="' + i + '">' + i + '</option>';
                     }
+                    pagination += '</select>';
                     pagination += '</div>';
                     $('#cmbsolver-api-pagination').html(pagination);
                 }
 
-                $(document).on('click', '.pagination-button', function() {
-                    currentPage = $(this).data('page');
+                $(document).off('change', '#page-select').on('change', '#page-select', function() {
+                    currentPage = $(this).val();
                     renderTable(currentPage);
                 });
 
