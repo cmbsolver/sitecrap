@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 
 require 'vendor/autoload.php';
 require 'config.php';
+require 'wordpattern.php';
 
 use Slim\Factory\AppFactory;
 use DI\Container;
@@ -80,6 +81,14 @@ $app->get('/runewords.php/rune_pattern_no_doublet/{value}', function(Request $re
     $db = $this->get('db');
     $data = queryDatabase('rune_pattern_no_doublet', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->get('/runewords.php/wordpattern/{value}', function(Request $request, Response $response, $args) {
+    $value = $args['value'] ?? '';
+    $wordPattern = new WordPattern();
+    $wordPattern->generatePattern($value);
+    $response->getBody()->write(json_encode($wordPattern, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
