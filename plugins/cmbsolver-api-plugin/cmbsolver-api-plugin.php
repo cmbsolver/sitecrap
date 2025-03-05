@@ -31,6 +31,8 @@ function cmbsolver_api_plugin_shortcode() {
         <button type="submit">Submit</button>
     </form>
     <div id="cmbsolver-api-response"></div>
+    <div id="cmbsolver-api-response"></div>
+    <div id="cmbsolver-api-pagination"></div>
     <?php
     return ob_get_clean();
 }
