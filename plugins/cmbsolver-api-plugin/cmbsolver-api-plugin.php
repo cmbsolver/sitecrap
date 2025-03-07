@@ -29,8 +29,8 @@ function cmbsolver_api_plugin_shortcode() {
             <option value="rune_pattern_no_doublet">Rune Pattern (no doublet)</option>
         </select>
         <button type="submit">Submit</button>
+        <button type="button" id="download-csv">Download CSV</button>
     </form>
-    <div id="cmbsolver-api-response"></div>
     <div id="cmbsolver-api-response"></div>
     <div id="cmbsolver-api-pagination"></div>
     <?php

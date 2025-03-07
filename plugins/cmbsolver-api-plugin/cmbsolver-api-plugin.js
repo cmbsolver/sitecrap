@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
                     var end = start + rowsPerPage;
                     var paginatedData = data.slice(start, end);
 
-                    var table = '<div style="overflow-x:auto;"><table>';
+                    var table = '<div style="overflow-x:auto;"><table id="data-table">';
                     table += '<tr>';
                     table += '<td><b><u>Id</u></b></td>';
                     table += '<td><b><u>Word</u></b></td>';
@@ -81,6 +81,45 @@ jQuery(document).ready(function($) {
             error: function(xhr, status, error) {
                 console.log('AJAX error:', error); // Debugging statement
                 $('#cmbsolver-api-response').html('<p>AJAX request failed: ' + error + '</p>');
+            }
+        });
+    });
+
+    $('#download-csv').on('click', function() {
+        var word = $('#word').val();
+        var endpoint = $('#endpoint').val();
+        $.ajax({
+            url: cmbsolverApi.ajax_url + '/' + endpoint + '/' + word,
+            method: 'GET',
+            success: function(response) {
+                var data = response;
+                var csv = [];
+                var headers = Object.keys(data[0]);
+                csv.push(headers.join(','));
+
+                data.forEach(function(row) {
+                    var values = headers.map(function(header) {
+                        var value = row[header];
+                        if (typeof value === 'string' && value.includes(',')) {
+                            value = '"' + value.replace(/"/g, '""') + '"';
+                        }
+                        return value;
+                    });
+                    csv.push(values.join(','));
+                });
+
+                var csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
+                var encodedUri = encodeURI(csvContent);
+                var link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'data.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            error: function(xhr, status, error) {
+                console.log('AJAX error:', error); // Debugging statement
+                alert('Failed to download CSV: ' + error);
             }
         });
     });
