@@ -2,7 +2,7 @@
 /*
 Plugin Name: CMB Solver API Plugin
 Description: A plugin to interact with the CMB Solver API.
-Version: 1.1
+Version: 1.2
 Author: THE CMBSOLVER
 */
 
