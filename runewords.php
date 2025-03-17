@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 require 'vendor/autoload.php';
 require 'config.php';
 require 'wordpattern.php';
+require 'runedonkey.php';
 
 use Slim\Factory\AppFactory;
 use DI\Container;

@@ -276,7 +276,7 @@ class RuneDonkey {
         return $retval;
     }
 
-    function transposeLatinToRune(string $text): string
+    private function transposeLatinToRune(string $text): string
     {
         $text = strtoupper($text);
         $result = '';
