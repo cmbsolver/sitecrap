@@ -4,6 +4,10 @@
     "slim/psr7": "^1.0",
     "zircote/swagger-php": "^4.0",
     "php-di/php-di": "^7.0",
-    "phpoffice/phpspreadsheet": "^4.1"
+    "phpoffice/phpspreadsheet": "^4.1",
+    "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12.0"
   }
 }
