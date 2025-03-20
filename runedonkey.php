@@ -22,14 +22,23 @@ enum Actions
 class RuneDonkey {
     public function GenerateExcelFromValues($value, $textType, $whatToDo, $db): string
     {
-        $values = $this->GetValuesFromString($value, $textType, $whatToDo);
+        $typeOfText = $this->getTextType($textType);
+        $values = $this->GetValuesFromString($value, $typeOfText, $whatToDo);
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         foreach ($values as $colIndex => $val) {
-            $words = $this->queryDatabase($whatToDo, $val, $db);
+            $words = $this->queryDDatabase($whatToDo, $val, $db);
+            $sheet->setCellValue([$colIndex + 1, 1], $val);
+            $sheet->getCell([$colIndex + 1, 1])->getStyle()->getFont()->setBold(true);
+            $sheet->getCell([$colIndex + 1, 1])->getStyle()->getFont()->setUnderline(true);
             foreach ($words as $rowIndex => $word) {
-                $sheet->setCellValue([$colIndex + 1, $rowIndex + 1], $word['word']);
+                if (isset($word['dict_word'])) {
+                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 2], $word['dict_word']);
+                } else {
+                    // Handle the case where 'word' key is missing
+                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 2], 'N/A');
+                }
             }
         }
 
@@ -100,10 +109,11 @@ class RuneDonkey {
         return $valuesToGetFromDB;
     }
 
-    private function queryDatabase($field, $value, $db)
+    private function queryDDatabase($field, $value, $db)
     {
-        $stmt = $db->prepare("SELECT word FROM dictionary_words WHERE $field = :value");
-        $stmt->execute(['value' => $value]);
+        $stmt = $db->prepare("SELECT dict_word FROM dictionary_words WHERE $field = :value");
+        $stmt->bindParam(':value', $value, PDO::PARAM_STR);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -127,6 +137,25 @@ class RuneDonkey {
                 $retval .= $rune;
                 $previousCharacter = $rune;
             }
+        }
+
+        return $retval;
+    }
+
+    private function getTextType($textType): TextType
+    {
+        $retval = TextType::Latin;
+
+        switch ($textType) {
+            case "latin":
+                $retval = TextType::Latin;
+                break;
+            case "runes":
+                $retval = TextType::Runes;
+                break;
+            case "runeglish":
+                $retval = TextType::Runeglish;
+                break;
         }
 
         return $retval;

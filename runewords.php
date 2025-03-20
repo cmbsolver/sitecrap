@@ -51,30 +51,9 @@ $app->post('/runewords.php/generate_excel', function(Request $request, Response 
     // Call the GenerateExcelFromValues method
     $base64String = $runeDonkey->GenerateExcelFromValues($text, $textType, $action, $db);
 
-    // Decode the base64 string
-    $excelContent = base64_decode($base64String);
-
-    // Create a temporary file
-    $tempFile = tempnam(sys_get_temp_dir(), 'excel_') . '.xlsx';
-
-    // Write the decoded content to the temporary file
-    file_put_contents($tempFile, $excelContent);
-
-    // Return the file as a response
-    $response = $response->withHeader('Content-Description', 'File Transfer')
-        ->withHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        ->withHeader('Content-Disposition', 'attachment; filename="generated_excel.xlsx"')
-        ->withHeader('Expires', '0')
-        ->withHeader('Cache-Control', 'must-revalidate')
-        ->withHeader('Pragma', 'public')
-        ->withHeader('Content-Length', filesize($tempFile));
-
-    readfile($tempFile);
-
-    // Delete the temporary file
-    unlink($tempFile);
-
-    return $response;
+    // Return the base64 string as a JSON response
+    $response->getBody()->write(json_encode(['base64' => $base64String], JSON_UNESCAPED_UNICODE));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->get('/runewords.php/gem_sum/{value}', function(Request $request, Response $response, $args) {
