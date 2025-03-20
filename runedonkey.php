@@ -1,5 +1,10 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 require 'wordpattern.php';
+
+$config = require 'config.php';
 
 enum TextType
 {
@@ -19,6 +24,29 @@ enum Actions
 }
 
 class RuneDonkey {
+    public function GenerateExcelFromValues($value, $textType, $whatToDo, $db): string
+    {
+        $values = $this->GetValuesFromString($value, $textType, $whatToDo);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        foreach ($values as $colIndex => $val) {
+            $words = $this->queryDatabase($whatToDo, $val, $db);
+            foreach ($words as $rowIndex => $word) {
+                $sheet->setCellValue([$colIndex + 1, $rowIndex + 1], $word['word']);
+            }
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+        $writer->save($tempFile);
+
+        $base64 = base64_encode(file_get_contents($tempFile));
+        unlink($tempFile);
+
+        return $base64;
+    }
+
     public function GetValuesFromString($value, $textType, $whatToDo): array
     {
         $valuesToGetFromDB = [];
@@ -74,6 +102,13 @@ class RuneDonkey {
         }
 
         return $valuesToGetFromDB;
+    }
+
+    private function queryDatabase($field, $value, $db)
+    {
+        $stmt = $db->prepare("SELECT word FROM dictionary_words WHERE $field = :value");
+        $stmt->execute(['value' => $value]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function getSumOfRunes($runeString): int
