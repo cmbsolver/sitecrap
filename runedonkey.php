@@ -2,10 +2,6 @@
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-require 'wordpattern.php';
-
-$config = require 'config.php';
-
 enum TextType
 {
     case Runes;
