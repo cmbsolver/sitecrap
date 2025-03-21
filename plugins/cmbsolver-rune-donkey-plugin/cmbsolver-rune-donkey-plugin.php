@@ -19,7 +19,7 @@ function cmbsolver_generate_excel_form() {
     ?>
     <form id="generateExcelForm">
         <label for="text">Text:</label>
-        <input type="text" id="text" name="text" required><br><br>
+        <textarea id="text" name="text" required ></textarea><br><br>
 
         <label for="textType">Text Type:</label>
         <select id="textType" name="text_type" required>
