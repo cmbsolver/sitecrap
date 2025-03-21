@@ -1,6 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
+require 'wordpattern.php';
 require 'runedonkey.php';
 
 class RuneDonkeyTest extends TestCase
