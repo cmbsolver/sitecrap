@@ -27,17 +27,30 @@ class RuneDonkey {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        $delimiters = $this->getDelimitersFromString($value);
+
+        if (count($delimiters) == 0) {
+            $wordArray = [$value];
+        } else {
+            $wordArray = $this->getWordsFromString($value, $delimiters);
+        }
+
+        $topval = "Original:". $value . " - Delimiters:" . implode(',', $delimiters) . " - Words:" . implode(',', $wordArray);
+        $sheet->setCellValue([1, 1], $topval);
+        $sheet->mergeCells('A1:Z1');
+        $sheet->getCell([1, 1])->getStyle()->getFont()->setBold(true);
+
         foreach ($values as $colIndex => $val) {
             $words = $this->queryDDatabase($whatToDo, $val, $db);
-            $sheet->setCellValue([$colIndex + 1, 1], $val);
-            $sheet->getCell([$colIndex + 1, 1])->getStyle()->getFont()->setBold(true);
-            $sheet->getCell([$colIndex + 1, 1])->getStyle()->getFont()->setUnderline(true);
+            $sheet->setCellValue([$colIndex + 1, 2], $val);
+            $sheet->getCell([$colIndex + 1, 2])->getStyle()->getFont()->setBold(true);
+            $sheet->getCell([$colIndex + 1, 2])->getStyle()->getFont()->setUnderline(true);
             foreach ($words as $rowIndex => $word) {
                 if (isset($word['dict_word'])) {
-                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 2], $word['dict_word']);
+                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], $word['dict_word']);
                 } else {
                     // Handle the case where 'word' key is missing
-                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 2], 'N/A');
+                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], 'N/A');
                 }
             }
         }
@@ -62,8 +75,7 @@ class RuneDonkey {
         if (count($delimiters) == 0) {
             $wordArray = [$value];
         } else {
-            $pattern = '/[' . preg_quote(implode('', $delimiters), '/') . ']+/';
-            $wordArray = preg_split($pattern, $value);
+            $wordArray = $this->getWordsFromString($value, $delimiters);
         }
 
         for ($i = 0; $i < count($wordArray); $i++) {
@@ -434,6 +446,37 @@ class RuneDonkey {
         }
 
         return $retval;
+    }
+
+    private function getWordsFromString($value, $delimiters): array
+    {
+        $wordArray = [];
+        $upperString = strtoupper($value);
+        $arrayString = mb_str_split($upperString);
+
+        if (count($delimiters) == 0) {
+            $wordArray = [$value];
+        } else {
+            $currentWord = '';
+            foreach ($arrayString as $string) {
+                if ($this->isRune($string) || $this->isLatin($string)) {
+                    $currentWord .= $string;
+                }
+
+                if (in_array($string, $delimiters)) {
+                    if ($currentWord != '') {
+                        array_push($wordArray, $currentWord);
+                        $currentWord = '';
+                    }
+                }
+            }
+
+            if ($currentWord != '') {
+                array_push($wordArray, $currentWord);
+            }
+        }
+
+        return $wordArray;
     }
 
     private function getValueFromRune($rune): int
