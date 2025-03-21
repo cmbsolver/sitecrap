@@ -2,8 +2,8 @@
 /*
 Plugin Name: CMB Solver Rune Donkey Plugin
 Description: A plugin to generate Excel files based on user input.
-Version: 1.0
-Author: Your Name
+Version: 1.1
+Author: THE CMBSOLVER
 */
 
 // Enqueue scripts and styles
