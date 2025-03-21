@@ -50,7 +50,11 @@ jQuery(document).ready(function($) {
                     for (var i = 0; i < paginatedData.length; i++) {
                         table += '<tr>';
                         for (var key in paginatedData[i]) {
-                            table += '<td>' + paginatedData[i][key] + '</td>';
+                            if (key === 'dict_word') {
+                                table += '<td><a href="https://www.google.com/search?q=define+' + paginatedData[i][key] + '" target="new">' + paginatedData[i][key] + '</a></td>';
+                            } else {
+                                table += '<td>' + paginatedData[i][key] + '</td>';
+                            }
                         }
                         table += '</tr>';
                     }
