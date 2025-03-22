@@ -50,10 +50,10 @@ class RuneDonkey {
             foreach ($words as $rowIndex => $word) {
                 if (isset($word['dict_word'])) {
                     $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], $word['dict_word']);
-                    $hyperlink = 'https://www.google.com/search?q=define+' . $word['dict_word'];
-                    $hyperclass = new Hyperlink();
-                    $hyperclass->setUrl($hyperlink);
-                    $sheet->getCell([$colIndex + 1, $rowIndex + 3])->setHyperlink($hyperclass);
+                    //$hyperlink = 'https://www.google.com/search?q=define+' . $word['dict_word'];
+                    //$hyperclass = new Hyperlink();
+                    //$hyperclass->setUrl($hyperlink);
+                    //$sheet->getCell([$colIndex + 1, $rowIndex + 3])->setHyperlink($hyperclass);
                 } else {
                     // Handle the case where 'word' key is missing
                     $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], 'N/A');
