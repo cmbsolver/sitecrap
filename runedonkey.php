@@ -446,7 +446,7 @@ class RuneDonkey {
         $upperString = strtoupper($value);
         $arrayString = mb_str_split($upperString);
         foreach ($arrayString as $string) {
-            if (!$this->isRune($string) && !$this->isLatin($string) && !in_array($string, $retval)) {
+            if (!$this->isRune($string) && !$this->isLatin($string) && !$this->isSpecial($string) && !in_array($string, $retval)) {
                 array_push($retval, $string);
             }
         }
@@ -465,7 +465,7 @@ class RuneDonkey {
         } else {
             $currentWord = '';
             foreach ($arrayString as $string) {
-                if ($this->isRune($string) || $this->isLatin($string)) {
+                if ($this->isRune($string) || $this->isLatin($string) || $this->isSpecial($string)) {
                     $currentWord .= $string;
                 }
 
@@ -659,6 +659,19 @@ class RuneDonkey {
         }
 
         return $isLatin;
+    }
+
+    private function isSpecial($value): bool
+    {
+        $isSpecial = false;
+
+        switch ($value) {
+            case "'":
+            case "\"":
+                $isSpecial = true;
+        }
+
+        return $isSpecial;
     }
 }
 
