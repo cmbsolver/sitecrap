@@ -2,6 +2,12 @@ jQuery(document).ready(function($) {
     $('#generateExcelForm').on('submit', function(event) {
         event.preventDefault();
 
+        // Get the submit button and change its text
+        var $submitButton = $(this).find('button[type="submit"]');
+        var originalText = $submitButton.text();
+        $submitButton.text('Processing...').prop('disabled', true);
+
+
         var formData = $(this).serialize();
 
         $.ajax({
@@ -9,6 +15,7 @@ jQuery(document).ready(function($) {
             type: 'POST',
             data: formData,
             success: function(data) {
+                console.log(data);
                 console.log(data.base64);
 
                 // Check if the data is a valid Base64 string
@@ -17,6 +24,7 @@ jQuery(document).ready(function($) {
                     return;
                 }
 
+                var dateString = new Date().toISOString();
                 var byteCharacters = atob(data.base64);
                 var byteNumbers = new Array(byteCharacters.length);
                 for (var i = 0; i < byteCharacters.length; i++) {
@@ -27,14 +35,19 @@ jQuery(document).ready(function($) {
                 var a = document.createElement('a');
                 var url = window.URL.createObjectURL(blob);
                 a.href = url;
-                a.download = 'generated_excel.xlsx';
+                a.download = 'generated_excel ' + dateString + '.xlsx';
                 document.body.append(a);
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
+
+                // Reset button state after download completes
+                $submitButton.text(originalText).prop('disabled', false);
             },
             error: function(xhr, status, error) {
                 alert('Error: ' + error);
+                // Reset button state after download completes
+                $submitButton.text(originalText).prop('disabled', false);
             }
         });
     });

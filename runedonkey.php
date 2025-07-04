@@ -3,6 +3,7 @@
 use PhpOffice\PhpSpreadsheet\Cell\Hyperlink;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use \PhpOffice\PhpSpreadsheet\Style;
 
 enum TextType
 {
@@ -49,13 +50,16 @@ class RuneDonkey {
             $sheet->getCell([$colIndex + 1, 2])->getStyle()->getFont()->setUnderline(true);
             foreach ($words as $rowIndex => $word) {
                 if (isset($word['dict_word'])) {
-                    $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], $word['dict_word']);
-                    //$hyperlink = 'https://www.google.com/search?q=define+' . $word['dict_word'];
-                    //$hyperclass = new Hyperlink();
-                    //$hyperclass->setUrl($hyperlink);
-                    //$sheet->getCell([$colIndex + 1, $rowIndex + 3])->setHyperlink($hyperclass);
+                    if ($word['gem_sum_prime'] == 1) {
+                        $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], $word['dict_word'])
+                        ->getStyle([$colIndex + 1, $rowIndex + 3])
+                        ->getFill()->setFillType(Style\Fill::FILL_SOLID)
+                        ->getStartColor()->setARGB('34EB55');
+                    } else {
+                        $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], $word['dict_word']);
+                    }
                 } else {
-                    // Handle the case where 'word' key is missing
+                    // Handle the case where the 'dict_word' key is missing
                     $sheet->setCellValue([$colIndex + 1, $rowIndex + 3], 'N/A');
                 }
             }
@@ -129,7 +133,7 @@ class RuneDonkey {
 
     private function queryDDatabase($field, $value, $db)
     {
-        $stmt = $db->prepare("SELECT dict_word FROM dictionary_words WHERE $field = :value");
+        $stmt = $db->prepare("SELECT dict_word, gem_sum_prime FROM dictionary_words WHERE $field = :value");
         $stmt->bindParam(':value', $value, PDO::PARAM_STR);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
