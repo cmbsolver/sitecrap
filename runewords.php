@@ -22,7 +22,54 @@ $app = AppFactory::create();
 
 $container->set('db', function() use ($config) {
     try {
-        $pdo = new PDO("mysql:host={$config['host']};dbname={$config['dbname']}", $config['username'], $config['password']);
+        // Use the default connection
+        $dbConfig = $config['connections']['default'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}", 
+                       $dbConfig['username'], 
+                       $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+// To add a second database connection
+$container->set('norvig', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['norvig'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}", 
+                       $dbConfig['username'], 
+                       $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+$container->set('10k', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['10k'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+$container->set('20k', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['20k'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch (PDOException $e) {
@@ -41,9 +88,10 @@ $app->post('/runewords.php/generate_excel', function(Request $request, Response 
     $text = $params['text'] ?? '';
     $textType = $params['text_type'] ?? '';
     $action = $params['action'] ?? '';
+    $dataset = $params['dataset'] ?? '';
 
     // Get the database connection
-    $db = $this->get('db');
+    $db = $this->get($dataset);
 
     // Create an instance of RuneDonkey
     $runeDonkey = new RuneDonkey();
@@ -56,50 +104,50 @@ $app->post('/runewords.php/generate_excel', function(Request $request, Response 
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/gem_sum/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/gem_sum/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('gem_sum', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/gem_product/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/gem_product/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('gem_product', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/dict_word_length/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/dict_word_length/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('dict_word_length', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/dict_runeglish_length/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/dict_runeglish_length/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('dict_runeglish_length', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/dict_rune_length/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/dict_rune_length/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('dict_rune_length', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/rune_pattern/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/rune_pattern/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('rune_pattern', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-$app->get('/runewords.php/rune_pattern_no_doublet/{value}', function(Request $request, Response $response, $args) {
-    $db = $this->get('db');
+$app->get('/runewords.php/rune_pattern_no_doublet/{database}/{value}', function(Request $request, Response $response, $args) {
+    $db = $this->get($args['database']);
     $data = queryDatabase('rune_pattern_no_doublet', $args['value'], $db);
     $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');

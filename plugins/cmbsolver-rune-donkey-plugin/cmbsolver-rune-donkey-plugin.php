@@ -38,6 +38,14 @@ function cmbsolver_generate_excel_form() {
             <option value="rune_pattern_no_doublet">Rune Pattern (no doublet)</option>
         </select><br><br>
 
+        <label for="dataset">Dataset:</label>
+        <select id="dataset" name="dataset">
+            <option value="db">Default</option>
+            <option value="norvig">Norvig</option>
+            <option value="10k">10k</option>
+            <option value="20k">20k</option>
+        </select><br><br>
+
         <button type="submit">Download</button>
     </form>
     <div id="cmbsolver-rune-donkey-plugin-api-response"></div>

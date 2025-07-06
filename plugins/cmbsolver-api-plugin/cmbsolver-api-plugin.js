@@ -7,11 +7,12 @@ jQuery(document).ready(function($) {
 
         var word = $('#word').val();
         var endpoint = $('#endpoint').val();
+        var database = $('#dataset').val();
         console.log('Word:', word); // Debugging statement
         console.log('Endpoint:', endpoint); // Debugging statement
         console.log('URL:', cmbsolverApi.ajax_url); // Debugging statement
         $.ajax({
-            url: cmbsolverApi.ajax_url + '/' + endpoint + '/' + word,
+            url: cmbsolverApi.ajax_url + '/' + endpoint + '/' + database + '/' + word,
             method: 'GET',
             success: function(response) {
                 console.log('AJAX response:', response); // Debugging statement

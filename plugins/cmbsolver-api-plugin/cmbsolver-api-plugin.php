@@ -28,6 +28,13 @@ function cmbsolver_api_plugin_shortcode() {
             <option value="rune_pattern">Rune Pattern</option>
             <option value="rune_pattern_no_doublet">Rune Pattern (no doublet)</option>
         </select>
+        <label for="dataset">Dataset:</label>
+        <select id="dataset" name="dataset">
+            <option value="db">Default</option>
+            <option value="norvig">Norvig</option>
+            <option value="10k">10k</option>
+            <option value="20k">20k</option>
+        </select>
         <button type="submit">Submit</button>
         <button type="button" id="download-csv">Download CSV</button>
     </form>
@@ -41,7 +48,8 @@ add_shortcode('cmbsolver_api_form', 'cmbsolver_api_plugin_shortcode');
 function cmbsolver_api_plugin_handle_request() {
     $word = sanitize_text_field($_POST['word']);
     $endpoint = sanitize_text_field($_POST['endpoint']);
-    $api_url = "https://cmbsolver.com/cmbsolver-api/runewords.php/{$endpoint}/{$word}";
+    $database = sanitize_text_field($_POST['dataset']);
+    $api_url = "https://cmbsolver.com/cmbsolver-api/runewords.php/{$endpoint}/{$database}/{$word}";
 
     $response = wp_remote_get($api_url);
     if (is_wp_error($response)) {
