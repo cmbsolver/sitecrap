@@ -44,7 +44,14 @@ function cmbsolver_generate_excel_form() {
             <option value="norvig">Norvig</option>
             <option value="10k">10k</option>
             <option value="20k">20k</option>
+            <option value="db_reversed">Default (Reversed)</option>
+            <option value="norvig_reversed">Norvig (Reversed)</option>
+            <option value="10k_reversed">10k (Reversed)</option>
+            <option value="20k_reversed">20k (Reversed)</option>
         </select><br><br>
+
+        <input type="checkbox" id="reverse" name="reverse">
+        <label for="reverse">Reverse Words For Calculation</label><br><br>
 
         <button type="submit">Download</button>
     </form>

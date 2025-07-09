@@ -34,6 +34,10 @@ function cmbsolver_api_plugin_shortcode() {
             <option value="norvig">Norvig</option>
             <option value="10k">10k</option>
             <option value="20k">20k</option>
+            <option value="db_reversed">Default (Reversed)</option>
+            <option value="norvig_reversed">Norvig (Reversed)</option>
+            <option value="10k_reversed">10k (Reversed)</option>
+            <option value="20k_reversed">20k (Reversed)</option>
         </select>
         <button type="submit">Submit</button>
         <button type="button" id="download-csv">Download CSV</button>

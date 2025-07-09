@@ -23,8 +23,12 @@ enum Actions
 }
 
 class RuneDonkey {
-    public function GenerateExcelFromValues($value, $textType, $whatToDo, $db): string
+    public function GenerateExcelFromValues($value, $textType, $whatToDo, $db, $reverse): string
     {
+        if ($reverse) {
+            $value = $this->reverseWords($value);
+        }
+
         $typeOfText = $this->getTextType($textType);
         $values = $this->GetValuesFromString($value, $typeOfText, $whatToDo);
         $spreadsheet = new Spreadsheet();
@@ -475,14 +479,14 @@ class RuneDonkey {
 
                 if (in_array($string, $delimiters)) {
                     if ($currentWord != '') {
-                        array_push($wordArray, $currentWord);
+                        $wordArray[] = $currentWord;
                         $currentWord = '';
                     }
                 }
             }
 
             if ($currentWord != '') {
-                array_push($wordArray, $currentWord);
+                $wordArray[] = $currentWord;
             }
         }
 
@@ -676,6 +680,52 @@ class RuneDonkey {
         }
 
         return $isSpecial;
+    }
+
+    /**
+     * Reverses a string character by character.
+     *
+     * @param string $text The string to reverse
+     * @return string The reversed string
+     */
+    private function reverseString(string $text): string {
+        $length = mb_strlen($text);
+        $result = '';
+
+        for ($i = $length - 1; $i >= 0; $i--) {
+            $result .= mb_substr($text, $i, 1);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Reverses each word in a text while preserving separators.
+     *
+     * @param string $text The text to process
+     * @return string The text with reversed words
+     */
+    private function reverseWords(string $text): string {
+        $retval = [];
+        $charArray = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $sb = '';
+        $delimiters = $this->getDelimitersFromString($text);
+
+        for ($i = 0; $i < count($charArray); $i++) {
+            if (in_array($charArray[$i], $delimiters)) {
+                $retval[] = $charArray[$i];
+                $retval[] = $this->reverseString($sb);
+                $sb = '';
+            } else {
+                $sb .= $charArray[$i];
+            }
+        }
+
+        if (strlen($sb) > 0) {
+            $retval[] = $this->reverseString($sb);
+        }
+
+        return implode('', $retval);
     }
 }
 

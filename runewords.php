@@ -77,6 +77,63 @@ $container->set('20k', function() use ($config) {
     }
 });
 
+$container->set('db_reversed', function() use ($config) {
+    try {
+        // Use the default connection
+        $dbConfig = $config['connections']['default_reversed'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+// To add a second database connection
+$container->set('norvig_reversed', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['norvig_reversed'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+$container->set('10k_reversed', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['10k_reversed'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
+$container->set('20k_reversed', function() use ($config) {
+    try {
+        // Use the second connection
+        $dbConfig = $config['connections']['20k_reversed'];
+        $pdo = new PDO("mysql:host={$dbConfig['host']};dbname={$dbConfig['dbname']}",
+            $dbConfig['username'],
+            $dbConfig['password']);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $pdo;
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+});
+
 function queryDatabase($field, $value, $db) {
     $stmt = $db->prepare("SELECT * FROM dictionary_words WHERE $field = :value");
     $stmt->execute(['value' => $value]);
@@ -89,6 +146,7 @@ $app->post('/runewords.php/generate_excel', function(Request $request, Response 
     $textType = $params['text_type'] ?? '';
     $action = $params['action'] ?? '';
     $dataset = $params['dataset'] ?? '';
+    $reverse = $params['reverse'] ?? false;
 
     // Get the database connection
     $db = $this->get($dataset);
@@ -97,7 +155,7 @@ $app->post('/runewords.php/generate_excel', function(Request $request, Response 
     $runeDonkey = new RuneDonkey();
 
     // Call the GenerateExcelFromValues method
-    $base64String = $runeDonkey->GenerateExcelFromValues($text, $textType, $action, $db);
+    $base64String = $runeDonkey->GenerateExcelFromValues($text, $textType, $action, $db, $reverse);
 
     // Return the base64 string as a JSON response
     $response->getBody()->write(json_encode(['base64' => $base64String], JSON_UNESCAPED_UNICODE));
