@@ -713,8 +713,8 @@ class RuneDonkey {
 
         for ($i = 0; $i < count($charArray); $i++) {
             if (in_array($charArray[$i], $delimiters)) {
-                $retval[] = $charArray[$i];
                 $retval[] = $this->reverseString($sb);
+                $retval[] = $charArray[$i];
                 $sb = '';
             } else {
                 $sb .= $charArray[$i];
